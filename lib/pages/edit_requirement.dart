@@ -1,15 +1,18 @@
-import 'package:flutter/material.dart';
-import 'package:pmanager/models/requirement.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
-final client = Supabase.instance.client;
+import 'package:flutter/material.dart';
+import 'package:geproye/models/requirement.dart';
 
 class EditRequirementDialog extends StatefulWidget {
+  final int projectId;
   final Requirement requirement;
   final Function refresh;
 
   const EditRequirementDialog(
-      {super.key, required this.requirement, required this.refresh});
+      {super.key, required this.projectId, required this.requirement, required this.refresh});
 
   @override
   State<EditRequirementDialog> createState() => _EditRequirementDialogState();
@@ -21,9 +24,15 @@ class _EditRequirementDialogState extends State<EditRequirementDialog> {
   final TextEditingController _tecDescripcion = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+
+    _tecTipo.text = widget.requirement.tipo??'';
+    _tecDescripcion.text = widget.requirement.descripcion??'';
+  }
+
+  @override
   Widget build(BuildContext context) {
-    _tecTipo.text = widget.requirement.tipo as String;
-    _tecDescripcion.text = widget.requirement.descripcion as String;
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -54,18 +63,16 @@ class _EditRequirementDialogState extends State<EditRequirementDialog> {
                     const Text('Cancelar', style: TextStyle(color: Colors.red)),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   try {
-                    client.from('requisito')
-                    .update({
+                    var res = await http.patch(Uri.parse('${dotenv.env['API_URL']}/project/${widget.projectId}/requirement/${widget.requirement.id}'), body: <String, String>{
                       'tipo': _tecTipo.text,
                       'descripcion': _tecDescripcion.text,
-                    })
-                    .eq('id', widget.requirement.id)
-                    .then((element) {
-                      widget.refresh();
-                      Navigator.pop(context);
                     });
+                    
+                    if(context.mounted) Navigator.pop(context);
+                    widget.refresh();
+
                   } catch (e) {
                     print('error: ${e.toString()}');
                   }

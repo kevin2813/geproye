@@ -14,18 +14,18 @@ class Iteration {
   factory Iteration.fromJson(Map<String, dynamic> json) {
     return Iteration(
       id: json['id'],
-      projectId: json['fk_proyecto'],
-      fechaInicio: json['fecha_inicio'],
-      fechaTermino: json['fecha_termino'],
+      projectId: json['projectId'],
+      fechaInicio: json['fechaInicio'],
+      fechaTermino: json['fechaTermino'],
     );
   }
 
   Map toMap() {
     return {
       'id': id,
-      'fk_proyecto': projectId,
-      'fecha_inicio': fechaInicio,
-      'fecha_termino': fechaTermino,
+      'projectId': projectId,
+      'fechaInicio': fechaInicio,
+      'fechaTermino': fechaTermino,
     };
   }
 }

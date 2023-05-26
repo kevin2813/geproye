@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
-final client = Supabase.instance.client;
+import 'package:flutter/material.dart';
 
 class AddMemberDialog extends StatefulWidget {
   final int projectId;
@@ -49,19 +51,19 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
                     const Text('Cancelar', style: TextStyle(color: Colors.red)),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   try {
-                    client.from('integrante').insert({
-                      'id': widget.lastId + 1,
-                      'fk_proyecto': widget.projectId,
+                    var res = await http.post(Uri.parse('${dotenv.env['API_URL']}/project/${widget.projectId}/member'), body: <String, String>{
+                      //'id': '${widget.lastId + 1}',
                       'nombre': _tecNombre.text,
                       'cargo': _tecCargo.text,
-                    }).then((element) {
-                      Navigator.pop(context);
-                      widget.refresh();
                     });
+
+                    if(context.mounted) Navigator.pop(context);
+                    widget.refresh();
+
                   } catch (e) {
-                    print('error: ${e.toString()}');
+                    print('error rq: ${e.toString()}');
                   }
                 },
                 child: const Text(

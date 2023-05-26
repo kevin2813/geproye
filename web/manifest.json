@@ -1,6 +1,6 @@
 {
-    "name": "pmanager",
-    "short_name": "pmanager",
+    "name": "geproye",
+    "short_name": "geproye",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

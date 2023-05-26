@@ -1,8 +1,10 @@
-import 'package:flutter/material.dart';
-import 'package:pmanager/models/project.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
-final client = Supabase.instance.client;
+import 'package:flutter/material.dart';
+import 'package:geproye/models/project.dart';
 
 class EditProjectDialog extends StatefulWidget {
   final Project project;
@@ -22,7 +24,8 @@ class _EditProjectDialogState extends State<EditProjectDialog> {
   DateTime? _dtFechaTermino;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
 
     _tecNombre.text = widget.project.nombre??'';
     _tecEstado.text = widget.project.estado??'';
@@ -32,6 +35,10 @@ class _EditProjectDialogState extends State<EditProjectDialog> {
     if(widget.project.fechaTermino != null){
       _dtFechaTermino = DateTime.parse(widget.project.fechaTermino as String);
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -114,24 +121,23 @@ class _EditProjectDialogState extends State<EditProjectDialog> {
                     const Text('Cancelar', style: TextStyle(color: Colors.red)),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_tecNombre.text.isEmpty) {
                     Navigator.pop(context);
                     return;
                   }
+                  final f = DateFormat('yyyy-MM-dd');
                   try {
-                    client.from('proyecto')
-                    .update({
+                    var res = await http.patch(Uri.parse('${dotenv.env['API_URL']}/project/${widget.project.id}'), body: <String, String>{
                       'nombre': _tecNombre.text,
-                      'fecha_inicio': _dtFechaInicio?.toString(),
-                      'fecha_termino': _dtFechaTermino?.toString(),
+                      'fecha_inicio': f.format(_dtFechaInicio??DateTime.now()).toString(),
+                      'fecha_termino': f.format(_dtFechaTermino??DateTime.now()).toString(),
                       'estado': _tecEstado.text,
-                    })
-                    .eq('id', widget.project.id)
-                    .then((element) {
-                      widget.refresh();
-                      Navigator.pop(context);
                     });
+                    
+                    if(context.mounted) Navigator.pop(context);
+                    widget.refresh();
+
                   } catch (e) {
                     print('error: ${e.toString()}');
                   }

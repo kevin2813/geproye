@@ -1,9 +1,12 @@
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
-import 'package:pmanager/models/member.dart';
-import 'package:pmanager/models/project.dart';
-import 'package:pmanager/pages/add_member.dart';
-import 'package:pmanager/pages/edit_member.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:geproye/models/member.dart';
+import 'package:geproye/models/project.dart';
+import 'package:geproye/pages/add_member.dart';
+import 'package:geproye/pages/edit_member.dart';
 
 class MembersPage extends StatefulWidget {
   final Project project;
@@ -14,24 +17,14 @@ class MembersPage extends StatefulWidget {
   State<MembersPage> createState() => _MembersPageState();
 }
 
-final client = Supabase.instance.client;
-
 class _MembersPageState extends State<MembersPage> {
   int lastId = 0;
 
   Future<List<Member>> getRequirements() async {
-    final response = await client
-      .from('integrante')
-      .select('*')
-      .eq('fk_proyecto', widget.project.id)
-      .order('id', ascending: true);
-
-    if(response.length <= 0) {
-      return [];
-    }
-
     try {
-      final members = List<Member>.from(response.map((pj) {
+      final response = await http.get(Uri.parse('${dotenv.env['API_URL']}/project/${widget.project.id}/member'));
+      final body = json.decode(response.body);
+      final members = List<Member>.from(body['data'].map((pj) {
         return Member.fromJson(pj);
       }).toList());
       lastId = members.last.id;
@@ -90,7 +83,7 @@ class _MembersPageState extends State<MembersPage> {
                                   onPressed: () => showDialog<String>(
                                     context: context,
                                     builder: (BuildContext context) => Dialog(
-                                      child: EditMemberDialog(member: data[index], refresh: refresh),
+                                      child: EditMemberDialog(projectId: widget.project.id, member: data[index], refresh: refresh),
                                     ),
                                   ),
                                   icon: const Icon(Icons.edit)
@@ -98,13 +91,13 @@ class _MembersPageState extends State<MembersPage> {
                                 IconButton(
                                   tooltip: 'Eliminar',
                                   color: Colors.red,
-                                  onPressed: () {
-                                    client.from('integrante')
-                                    .delete()
-                                    .eq('id', data[index].id)
-                                    .then((val) {
+                                  onPressed: () async {
+                                    try {
+                                      final response = await http.delete(Uri.parse('${dotenv.env['API_URL']}/project/${widget.project.id}/member/${data[index].id}'));
                                       refresh();
-                                    },);
+                                    } catch (e) {
+                                      print('error fetch: ${e.toString()}');
+                                    }
                                   },
                                   icon: const Icon(Icons.delete)
                                 ),

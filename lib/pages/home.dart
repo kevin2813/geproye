@@ -1,10 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:pmanager/models/project.dart';
-import 'package:pmanager/pages/add_project.dart';
-import 'package:pmanager/pages/edit_project.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:geproye/router_generator.dart';
+import 'package:http/http.dart' as http;
 
-final client = Supabase.instance.client;
+import 'package:flutter/material.dart';
+import 'package:geproye/models/project.dart';
+import 'package:geproye/pages/add_project.dart';
+import 'package:geproye/pages/edit_project.dart';
+
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,21 +20,16 @@ class _HomeState extends State<HomePage> {
   int lastId = 0;
 
   Future<List<Project>> getProjects() async {
-    final response =
-        await client.from('proyecto').select('*').order('id', ascending: true);
-
-    if(response.length <= 0) {
-      return [];
-    }
-
     try {
-      final projects = List<Project>.from(response.map((pj) {
+      final response = await http.get(Uri.parse('${dotenv.env['API_URL']}/project'));
+      final body = json.decode(response.body);
+      final projects = List<Project>.from(body['data'].map((pj) {
         return Project.fromJson(pj);
       }).toList());
       lastId = projects.last.id;
       return projects;
     } catch (e) {
-      print('error: ${e.toString()}');
+      print('error fetch: ${e.toString()}');
     }
 
     return [];
@@ -48,8 +46,19 @@ class _HomeState extends State<HomePage> {
         appBar: AppBar(
           title: const Text('GEPROYE'),
           actions: [
-            IconButton(
-              onPressed: () {},
+            PopupMenuButton(
+              itemBuilder: (context) {
+                return [
+                  PopupMenuItem(
+                    child: TextButton(
+                      onPressed: () async {
+                        await supabase.auth.signOut();
+                      }, 
+                      child: const Text('Cerrar sesión') ,
+                    ),
+                  ),
+                ];
+              },
               icon: const Icon(Icons.more_vert),
             ),
           ],
@@ -102,13 +111,13 @@ class _HomeState extends State<HomePage> {
                                 IconButton(
                                   tooltip: 'Eliminar',
                                   color: Colors.red,
-                                  onPressed: () {
-                                    client.from('proyecto')
-                                    .delete()
-                                    .eq('id', data[index].id)
-                                    .then((val) {
+                                  onPressed: () async {
+                                    try {
+                                      final response = await http.delete(Uri.parse('${dotenv.env['API_URL']}/project/${data[index].id}'));
                                       refresh();
-                                    },);
+                                    } catch (e) {
+                                      print('error fetch: ${e.toString()}');
+                                    }
                                   },
                                   icon: const Icon(Icons.delete)
                                 ),

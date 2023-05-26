@@ -1,15 +1,18 @@
-import 'package:flutter/material.dart';
-import 'package:pmanager/models/member.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
-final client = Supabase.instance.client;
+import 'package:flutter/material.dart';
+import 'package:geproye/models/member.dart';
 
 class EditMemberDialog extends StatefulWidget {
+  final int projectId;
   final Member member;
   final Function refresh;
 
   const EditMemberDialog(
-      {super.key, required this.member, required this.refresh});
+      {super.key, required this.projectId, required this.member, required this.refresh});
 
   @override
   State<EditMemberDialog> createState() => _EditMemberDialogState();
@@ -21,10 +24,15 @@ class _EditMemberDialogState extends State<EditMemberDialog> {
   final TextEditingController _tecCargo = TextEditingController();
 
   @override
-  Widget build(BuildContext context) {
-    _tecNombre.text = widget.member.nombre as String;
-    _tecCargo.text = widget.member.cargo as String;
+  void initState() {
+    super.initState();
 
+    _tecNombre.text = widget.member.nombre??'';
+    _tecCargo.text = widget.member.cargo??'';
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -54,20 +62,18 @@ class _EditMemberDialogState extends State<EditMemberDialog> {
                     const Text('Cancelar', style: TextStyle(color: Colors.red)),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   try {
-                    client.from('integrante')
-                    .update({
+                    var res = await http.patch(Uri.parse('${dotenv.env['API_URL']}/project/${widget.projectId}/member/${widget.member.id}'), body: <String, String>{
                       'nombre': _tecNombre.text,
                       'cargo': _tecCargo.text,
-                    })
-                    .eq('id', widget.member.id)
-                    .then((element) {
-                      widget.refresh();
-                      Navigator.pop(context);
                     });
+                    
+                    if(context.mounted) Navigator.pop(context);
+                    widget.refresh();
+
                   } catch (e) {
-                    print('error: ${e.toString()}');
+                    print('error rq: ${e.toString()}');
                   }
                 },
                 child: const Text(

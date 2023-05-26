@@ -1,34 +1,35 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:geproye/models/iteration.dart';
-import 'package:geproye/models/project.dart';
+import 'package:geproye/models/activity.dart';
 import 'package:geproye/pages/add_iteration.dart';
 import 'package:geproye/pages/edit_iteration.dart';
+import 'package:http/http.dart' as http;
 
-class ProjectPage extends StatefulWidget {
-  final Project project;
+class ActivityPage extends StatefulWidget {
+  final Iteration iteration;
 
-  const ProjectPage({super.key, required this.project});
+  const ActivityPage({super.key, required this.iteration});
 
   @override
-  State<ProjectPage> createState() => _ProjectPageState();
+  State<ActivityPage> createState() => _ActivityPageState();
 }
 
-class _ProjectPageState extends State<ProjectPage> {
+
+class _ActivityPageState extends State<ActivityPage> {
   int lastId = 0;
 
   Future<List<Iteration>> getIterations() async {
     try {
-      final response = await http.get(Uri.parse('${dotenv.env['API_URL']}/project/${widget.project.id}/iteration'));
+      final response = await http.get(Uri.parse('${dotenv.env['API_URL']}/v1/project'));
       final body = json.decode(response.body);
-      final iterations = List<Iteration>.from(body['data'].map((pj) {
+      final projects = List<Iteration>.from(body['data'].map((pj) {
         return Iteration.fromJson(pj);
       }).toList());
-      lastId = iterations.last.id;
-      return iterations;
+      lastId = projects.last.id;
+      return projects;
     } catch (e) {
       print('error: ${e.toString()}');
     }
@@ -51,20 +52,19 @@ class _ProjectPageState extends State<ProjectPage> {
             },
             icon: const Icon(Icons.arrow_back),
           ),
-          title: Text(widget.project.nombre ?? 'Sin nombre'),
           actions: [
             IconButton(
               onPressed: () {
-                Navigator.of(context, rootNavigator: true)
-                    .pushNamed('/requirements', arguments: widget.project);
+                /* Navigator.of(context, rootNavigator: true)
+                    .pushNamed('/requirements', arguments: widget.Activity); */
               },
               tooltip: 'Requisitos',
               icon: const Icon(Icons.notes),
             ),
             IconButton(
               onPressed: () {
-                Navigator.of(context, rootNavigator: true)
-                    .pushNamed('/members', arguments: widget.project);
+                /* Navigator.of(context, rootNavigator: true)
+                    .pushNamed('/members', arguments: widget.activity); */
               },
               tooltip: 'Integrantes',
               icon: const Icon(Icons.group),
@@ -153,40 +153,26 @@ class _ProjectPageState extends State<ProjectPage> {
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           IconButton(
-                                              tooltip: 'Ver',
+                                              tooltip: 'Ver Actividades',
                                               color: Colors.blue,
                                               onPressed: () {
-                                                Navigator.of(context, rootNavigator: true)
-                                                  .pushNamed('/activity', arguments: it);
+                                                /* Navigator.of(context,
+                                                        rootNavigator: true)
+                                                    .pushNamed('/activities',
+                                                        arguments:
+                                                            widget.Activity); */
                                               },
                                               icon: const Icon(Icons.list)),
                                           IconButton(
                                               tooltip: 'Editar',
                                               color: Colors.blue,
-                                              onPressed: () =>
-                                                  showDialog<String>(
-                                                    context: context,
-                                                    builder: (BuildContext
-                                                            context) =>
-                                                        Dialog(
-                                                      child:
-                                                          EditIterationDialog(
-                                                              projectId: widget.project.id,
-                                                              iteration: it,
-                                                              refresh: refresh),
-                                                    ),
-                                                  ),
+                                              onPressed: () {},
                                               icon: const Icon(Icons.edit)),
                                           IconButton(
                                               tooltip: 'Eliminar',
                                               color: Colors.red,
-                                              onPressed: () async {
-                                                try {
-                                                  final response = await http.delete(Uri.parse('${dotenv.env['API_URL']}/project/${widget.project.id}/iteration/${it.id}'));
-                                                  refresh();
-                                                } catch (e) {
-                                                  print('error fetch: ${e.toString()}');
-                                                }
+                                              onPressed: () {
+                                                
                                               },
                                               icon: const Icon(Icons.delete)),
                                         ],
@@ -207,19 +193,19 @@ class _ProjectPageState extends State<ProjectPage> {
             ),
           ],
         ),
-        floatingActionButton: FloatingActionButton(
+        /*floatingActionButton: FloatingActionButton(
           onPressed: () => showDialog<String>(
             context: context,
             builder: (BuildContext context) => Dialog(
               child: AddIterationDialog(
-                  projectId: widget.project.id,
+                  ActivityId: widget.Activity.id,
                   lastId: lastId,
                   refresh: refresh),
             ),
           ),
           tooltip: 'Añadir Iteracion',
           child: const Icon(Icons.add),
-        ),
+        ),*/
       ),
     );
   }

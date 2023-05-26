@@ -16,8 +16,8 @@ class Project {
     return Project(
       id: json['id'],
       nombre: json['nombre'],
-      fechaInicio: json['fecha_inicio'],
-      fechaTermino: json['fecha_termino'],
+      fechaInicio: json['fechaInicio'],
+      fechaTermino: json['fechaTermino'],
       estado: json['estado'],
     );
   }
@@ -26,8 +26,8 @@ class Project {
     return {
       'id': id,
       'nombre': nombre,
-      'fecha_inicio': fechaInicio,
-      'fecha_termino': fechaTermino,
+      'fechaInicio': fechaInicio,
+      'fechaTermino': fechaTermino,
       'estado': estado,
     };
   }

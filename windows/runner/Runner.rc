@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "pmanager" "\0"
+            VALUE "CompanyName", "com.uta" "\0"
+            VALUE "FileDescription", "geproye" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "pmanager" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "pmanager.exe" "\0"
-            VALUE "ProductName", "pmanager" "\0"
+            VALUE "InternalName", "geproye" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2023 com.uta. All rights reserved." "\0"
+            VALUE "OriginalFilename", "geproye.exe" "\0"
+            VALUE "ProductName", "geproye" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

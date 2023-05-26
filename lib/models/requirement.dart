@@ -14,7 +14,7 @@ class Requirement {
   factory Requirement.fromJson(Map<String, dynamic> json) {
     return Requirement(
       id: json['id'],
-      projectId: json['fk_proyecto'],
+      projectId: json['projectId'],
       tipo: json['tipo'],
       descripcion: json['descripcion'],
     );
@@ -23,7 +23,7 @@ class Requirement {
   Map toMap() {
     return {
       'id': id,
-      'fk_proyecto': projectId,
+      'projectId': projectId,
       'tipo': tipo,
       'descripcion': descripcion,
     };

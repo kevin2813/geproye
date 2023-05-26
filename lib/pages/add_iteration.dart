@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
-final client = Supabase.instance.client;
+import 'package:flutter/material.dart';
 
 class AddIterationDialog extends StatefulWidget {
   final int projectId;
@@ -86,17 +88,18 @@ class _AddIterationDialogState extends State<AddIterationDialog> {
                     const Text('Cancelar', style: TextStyle(color: Colors.red)),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
+                  final f = DateFormat('yyyy-MM-dd');
                   try {
-                    client.from('iteracion').insert({
-                      'id': widget.lastId + 1,
-                      'fk_proyecto': widget.projectId,
-                      'fecha_inicio': _dtFechaInicio?.toString(),
-                      'fecha_termino': _dtFechaTermino?.toString(),
-                    }).then((element) {
-                      Navigator.pop(context);
-                      widget.refresh();
+                    var res = await http.post(Uri.parse('${dotenv.env['API_URL']}/project/${widget.projectId}/iteration'), body: <String, String>{
+                      //'id': '${widget.lastId + 1}',
+                      'fechaInicio': f.format(_dtFechaInicio??DateTime.now()).toString(),
+                      'fechaTermino': f.format(_dtFechaTermino??DateTime.now()).toString(),
                     });
+                    
+                    if(context.mounted) Navigator.pop(context);
+                    widget.refresh();
+
                   } catch (e) {
                     print('error: ${e.toString()}');
                   }

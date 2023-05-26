@@ -1,15 +1,18 @@
-import 'package:flutter/material.dart';
-import 'package:pmanager/models/iteration.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
-final client = Supabase.instance.client;
+import 'package:flutter/material.dart';
+import 'package:geproye/models/iteration.dart';
 
 class EditIterationDialog extends StatefulWidget {
+  final int projectId;
   final Iteration iteration;
   final Function refresh;
 
   const EditIterationDialog(
-      {super.key, required this.iteration, required this.refresh});
+      {super.key, required this.projectId, required this.iteration, required this.refresh});
 
   @override
   State<EditIterationDialog> createState() => _EditIterationDialogState();
@@ -20,7 +23,8 @@ class _EditIterationDialogState extends State<EditIterationDialog> {
   DateTime? _dtFechaTermino;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
 
     if(widget.iteration.fechaInicio != null){
       _dtFechaInicio = DateTime.parse(widget.iteration.fechaInicio as String);
@@ -28,6 +32,10 @@ class _EditIterationDialogState extends State<EditIterationDialog> {
     if(widget.iteration.fechaTermino != null){
       _dtFechaTermino = DateTime.parse(widget.iteration.fechaTermino as String);
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
 
     return Padding(
       padding: const EdgeInsets.all(8.0),
@@ -98,18 +106,17 @@ class _EditIterationDialogState extends State<EditIterationDialog> {
                     const Text('Cancelar', style: TextStyle(color: Colors.red)),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
+                  final f = DateFormat('yyyy-MM-dd');
                   try {
-                    client.from('iteracion')
-                    .update({
-                      'fecha_inicio': _dtFechaInicio?.toString(),
-                      'fecha_termino': _dtFechaTermino?.toString(),
-                    })
-                    .eq('id', widget.iteration.id)
-                    .then((element) {
-                      widget.refresh();
-                      Navigator.pop(context);
+                    var res = await http.patch(Uri.parse('${dotenv.env['API_URL']}/project/${widget.projectId}/iteration/${widget.iteration.id}'), body: <String, String>{
+                      'fecha_inicio': f.format(_dtFechaInicio??DateTime.now()).toString(),
+                      'fecha_termino': f.format(_dtFechaTermino??DateTime.now()).toString(),
                     });
+                    
+                    if(context.mounted) Navigator.pop(context);
+                    widget.refresh();
+
                   } catch (e) {
                     print('error: ${e.toString()}');
                   }

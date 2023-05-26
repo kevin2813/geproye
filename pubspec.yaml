@@ -1,4 +1,4 @@
-name: pmanager
+name: geproye
 description: A new Flutter project.
 publish_to: 'none'
 version: 0.1.0
@@ -9,8 +9,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_dotenv: ^5.0.2
+  google_fonts: ^4.0.4
+  http: ^0.13.6
+  intl: ^0.18.1
   provider: ^6.0.5
-  supabase_flutter: ^1.6.2
+  supabase_flutter: ^1.10.0
 
 dev_dependencies:
   flutter_test:
@@ -19,3 +23,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - .env
+    - assets/images/

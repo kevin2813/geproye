@@ -1,9 +1,12 @@
+import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+
 import 'package:flutter/material.dart';
-import 'package:pmanager/models/project.dart';
-import 'package:pmanager/models/requirement.dart';
-import 'package:pmanager/pages/add_requirement.dart';
-import 'package:pmanager/pages/edit_requirement.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:geproye/models/project.dart';
+import 'package:geproye/models/requirement.dart';
+import 'package:geproye/pages/add_requirement.dart';
+import 'package:geproye/pages/edit_requirement.dart';
 
 class RequirementsPage extends StatefulWidget {
   final Project project;
@@ -14,24 +17,14 @@ class RequirementsPage extends StatefulWidget {
   State<RequirementsPage> createState() => _RequirementsPageState();
 }
 
-final client = Supabase.instance.client;
-
 class _RequirementsPageState extends State<RequirementsPage> {
   int lastId = 0;
 
   Future<List<Requirement>> getRequirements() async {
-    final response = await client
-      .from('requisito')
-      .select('*')
-      .eq('fk_proyecto', widget.project.id)
-      .order('id', ascending: true);
-
-    if(response.length <= 0) {
-      return [];
-    }
-
     try {
-      final requirements = List<Requirement>.from(response.map((pj) {
+      final response = await http.get(Uri.parse('${dotenv.env['API_URL']}/project/${widget.project.id}/requirement'));
+      final body = json.decode(response.body);
+      final requirements = List<Requirement>.from(body['data'].map((pj) {
         return Requirement.fromJson(pj);
       }).toList());
       lastId = requirements.last.id;
@@ -90,7 +83,7 @@ class _RequirementsPageState extends State<RequirementsPage> {
                                   onPressed: () => showDialog<String>(
                                     context: context,
                                     builder: (BuildContext context) => Dialog(
-                                      child: EditRequirementDialog(requirement: data[index], refresh: refresh),
+                                      child: EditRequirementDialog(projectId: widget.project.id, requirement: data[index], refresh: refresh),
                                     ),
                                   ),
                                   icon: const Icon(Icons.edit)
@@ -98,13 +91,13 @@ class _RequirementsPageState extends State<RequirementsPage> {
                                 IconButton(
                                   tooltip: 'Eliminar',
                                   color: Colors.red,
-                                  onPressed: () {
-                                    client.from('requisito')
-                                    .delete()
-                                    .eq('id', data[index].id)
-                                    .then((val) {
+                                  onPressed: () async {
+                                    try {
+                                      final response = await http.delete(Uri.parse('${dotenv.env['API_URL']}/project/${widget.project.id}/requirement/${data[index].id}'));
                                       refresh();
-                                    },);
+                                    } catch (e) {
+                                      print('error fetch: ${e.toString()}');
+                                    }
                                   },
                                   icon: const Icon(Icons.delete)
                                 ),

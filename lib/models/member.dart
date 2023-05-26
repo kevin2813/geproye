@@ -14,7 +14,7 @@ class Member {
   factory Member.fromJson(Map<String, dynamic> json) {
     return Member(
       id: json['id'],
-      projectId: json['fk_proyecto'],
+      projectId: json['projectId'],
       nombre: json['nombre'],
       cargo: json['cargo'],
     );
@@ -23,7 +23,7 @@ class Member {
   Map toMap() {
     return {
       'id': id,
-      'fk_proyecto': projectId,
+      'projectId': projectId,
       'nombre': nombre,
       'cargo': cargo,
     };
