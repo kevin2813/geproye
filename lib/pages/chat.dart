@@ -35,14 +35,16 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
 
+  String ip = "";
+
   Future<List<ChatUser>> getChatUsers() async {
     try {
       final response = await http.get(Uri.parse('${dotenv.env['API_URL']}/discover'));
       final body = json.decode(response.body);
       final chatUsers = List<ChatUser>.from(body.map((pj) {
-        print(pj);
-        return ChatUser.fromJson(pj);
-      }).toList());
+        final user = ChatUser.fromJson(pj);
+        return user.ip != ip ? user : null;
+      }).where((user) => user != null).toList());
       
       return chatUsers;
     } catch (e) {
@@ -59,7 +61,7 @@ class _ChatPageState extends State<ChatPage> {
     try {
       final email = supabase.auth.currentUser?.email;
       http.get(Uri.parse('https://api.ipify.org')).then((resIp) {
-        final ip = resIp.body;
+        ip = resIp.body;
         http.post(
           Uri.parse('${dotenv.env['API_URL']}/discover'), 
           body: <String, String>{
