@@ -10,6 +10,7 @@ import 'package:geproye/pages/project.dart';
 import 'package:geproye/pages/requirements.dart';
 import 'package:geproye/pages/splash_screen.dart';
 import 'package:geproye/pages/login.dart';
+import 'package:geproye/pages/chat.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 final supabase = Supabase.instance.client;
@@ -56,6 +57,9 @@ class RouterNavigator {
           return MaterialPageRoute<ProjectPage>(
               builder: (context) => MembersPage(project: pj));
         }
+      case '/chat':
+        return MaterialPageRoute<ChatPage>(
+            builder: (context) => const ChatPage());
       default:
         return MaterialPageRoute<HomePage>(
             builder: (context) => const HomePage());

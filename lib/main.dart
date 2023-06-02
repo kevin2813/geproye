@@ -14,7 +14,7 @@ Future<void> main() async {
     anonKey: dotenv.env['SUPABASE_API_KEY']!,
   );
 
-  runApp(const MaterialApp(
+  runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     initialRoute: '/',
     onGenerateRoute: RouterNavigator.generateRoute,
