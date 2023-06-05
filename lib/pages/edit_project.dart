@@ -6,6 +6,8 @@ import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:geproye/models/project.dart';
 
+const List<String> list = <String>['Creado', 'En Curso', 'Terminado'];
+
 class EditProjectDialog extends StatefulWidget {
   final Project project;
   final Function refresh;
@@ -19,16 +21,16 @@ class EditProjectDialog extends StatefulWidget {
 
 class _EditProjectDialogState extends State<EditProjectDialog> {
   final TextEditingController _tecNombre = TextEditingController();
-  final TextEditingController _tecEstado = TextEditingController();
   DateTime? _dtFechaInicio;
   DateTime? _dtFechaTermino;
+  String dropdownValue = list.first;
 
   @override
   void initState() {
     super.initState();
 
     _tecNombre.text = widget.project.nombre??'';
-    _tecEstado.text = widget.project.estado??'';
+    dropdownValue = widget.project.estado??list.first;
     if(widget.project.fechaInicio != null){
       _dtFechaInicio = DateTime.parse(widget.project.fechaInicio as String);
     }
@@ -106,9 +108,27 @@ class _EditProjectDialogState extends State<EditProjectDialog> {
           ),
           const SizedBox(height: 15),
           const Text('Estado:'),
-          TextField(
-            textAlign: TextAlign.center,
-            controller: _tecEstado,
+          DropdownButton<String>(
+            value: dropdownValue,
+            icon: const Icon(Icons.arrow_downward),
+            elevation: 16,
+            style: const TextStyle(color: Colors.blue),
+            underline: Container(
+              height: 2,
+              color: Colors.blueAccent,
+            ),
+            onChanged: (String? value) {
+              // This is called when the user selects an item.
+              setState(() {
+                dropdownValue = value!;
+              });
+            },
+            items: list.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
           ),
           Row(
             children: [
@@ -130,14 +150,13 @@ class _EditProjectDialogState extends State<EditProjectDialog> {
                   try {
                     var res = await http.patch(Uri.parse('${const String.fromEnvironment('API_URL')}/project/${widget.project.id}'), body: <String, String>{
                       'nombre': _tecNombre.text,
-                      'fecha_inicio': f.format(_dtFechaInicio??DateTime.now()).toString(),
-                      'fecha_termino': f.format(_dtFechaTermino??DateTime.now()).toString(),
-                      'estado': _tecEstado.text,
+                      'fechaInicio': f.format(_dtFechaInicio??DateTime.now()).toString(),
+                      'fechaTermino': f.format(_dtFechaTermino??DateTime.now()).toString(),
+                      'estado': dropdownValue,
                     });
                     
                     if(context.mounted) Navigator.pop(context);
                     widget.refresh();
-
                   } catch (e) {
                     print('error: ${e.toString()}');
                   }

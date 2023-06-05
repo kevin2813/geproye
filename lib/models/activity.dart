@@ -24,8 +24,8 @@ class Activity {
       iterationId: json['fk_iteracion'],
       nombre: json['nombre'],
       ejecutor: json['ejecutor'],
-      fechaInicio: json['fecha_inicio'],
-      fechaTermino: json['fecha_termino'],
+      fechaInicio: json['fechaInicio'],
+      fechaTermino: json['fechaTermino'],
     );
   }
 
@@ -36,8 +36,8 @@ class Activity {
       'fk_iteracion': iterationId,
       'nombre': nombre,
       'ejecutor': ejecutor,
-      'fecha_inicio': fechaInicio,
-      'fecha_termino': fechaTermino,
+      'fechaInicio': fechaInicio,
+      'fechaTermino': fechaTermino,
     };
   }
 }

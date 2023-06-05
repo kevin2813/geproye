@@ -110,8 +110,8 @@ class _EditIterationDialogState extends State<EditIterationDialog> {
                   final f = DateFormat('yyyy-MM-dd');
                   try {
                     var res = await http.patch(Uri.parse('${const String.fromEnvironment('API_URL')}/project/${widget.projectId}/iteration/${widget.iteration.id}'), body: <String, String>{
-                      'fecha_inicio': f.format(_dtFechaInicio??DateTime.now()).toString(),
-                      'fecha_termino': f.format(_dtFechaTermino??DateTime.now()).toString(),
+                      'fechaInicio': f.format(_dtFechaInicio??DateTime.now()).toString(),
+                      'fechaTermino': f.format(_dtFechaTermino??DateTime.now()).toString(),
                     });
                     
                     if(context.mounted) Navigator.pop(context);
