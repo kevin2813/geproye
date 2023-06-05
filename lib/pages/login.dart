@@ -91,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text('Ingreso ${const String.fromEnvironment('SUPABASE_API_URL')}')
+        title: const Text('Ingreso')
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
