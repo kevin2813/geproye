@@ -6,7 +6,24 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:peerdart/peerdart.dart';
 
+class Message {
+  String sender;
+  String date;
+  String message;
+  Message(this.sender, this.date, this.message);
+}
+
 final supabase = Supabase.instance.client;
+final email = supabase.auth.currentUser!.email!;
+String emailSender = "";
+
+extension on List<Message>{
+  void addIf(Message msg) {
+    if(any((element) => element.sender == msg.sender && element.message == msg.message && DateTime.parse(msg.date).difference(DateTime.parse(element.date)).inSeconds < 2)) return;
+    add(msg);
+  }
+}
+
 class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
 
@@ -24,7 +41,7 @@ class _ChatPageState extends State<ChatPage> {
   String? peerId;
   late DataConnection conn;
   bool connected = false;
-  List<String> messages = [];
+  List<Message> messages = [];
 
    @override
   void dispose() {
@@ -38,11 +55,11 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
 
-    try{
-    peer = Peer(options: PeerOptions(host: host, port: port, path: path, debug: LogLevel.All, secure: false));
+    peer = Peer(options: PeerOptions(host: host, port: port, path: path, debug: LogLevel.Errors, secure: false));
     //peer = Peer(options: PeerOptions(host: 'geproyepeer.azurewebsites.net', path: '/peer', debug: LogLevel.All));
 
     peer.on("open").listen((id) {
+      print('data open1');
       setState(() {
         peerId = peer.id;
       });
@@ -52,8 +69,10 @@ class _ChatPageState extends State<ChatPage> {
       conn = event;
 
       conn.on("data").listen((data) {
+        print('data recibida1');
         setState(() {
-          messages.add(data);
+          if(emailSender != data['sender']) {emailSender = data['sender'];}
+          messages.addIf(Message(data['sender'], DateTime.now().toString(), data['message']));
         });
       });
 
@@ -63,6 +82,7 @@ class _ChatPageState extends State<ChatPage> {
       });
 
       conn.on("close").listen((event) {
+        print('data close1');
         setState(() {
           connected = false;
         });
@@ -73,9 +93,6 @@ class _ChatPageState extends State<ChatPage> {
       });
       
     });
-    } catch (e) {
-      print('ERROR PEER: ' + e.toString());
-    }
   }
 
   void connect() {
@@ -83,19 +100,23 @@ class _ChatPageState extends State<ChatPage> {
     conn = connection;
 
     conn.on("open").listen((event) {
+      print('data open2');
       setState(() {
         connected = true;
       });
 
       connection.on("close").listen((event) {
+        print('data close2');
         setState(() {
           connected = false;
         });
       });
 
       conn.on("data").listen((data) {
+        print('data recibida2');
+        if(emailSender != data['sender']) {emailSender = data['sender'];}
         setState(() {
-          messages.add(data);
+          messages.addIf(Message(data['sender'], DateTime.now().toString(), data['message']));
         });
       });
       conn.on("binary").listen((data) {
@@ -106,8 +127,12 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void sendHelloWorld() {
-    conn.send(_chatController.text);
-    messages.add(_chatController.text);
+    final now = DateTime.now().toString();
+    conn.send({ 'sender': supabase.auth.currentUser!.email!, 'date': now, 'message': _chatController.text });
+    setState(() {
+      messages.addIf(Message(email, now, _chatController.text));
+      _chatController.text = '';
+    });
   }
 
   void sendBinary() {
@@ -144,32 +169,42 @@ class _ChatPageState extends State<ChatPage> {
         ));
     } else {
       return Scaffold(
-        appBar: AppBar(),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              _renderState(),
-              const Text(
-                'CHAT:',
-              ),
-              Expanded(child: ListView.builder(
-                itemCount: messages.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(messages[index])
-                  );
-                })),
-              TextField(
-                controller: _chatController,
-              ),
-              ElevatedButton(
-                  onPressed: sendHelloWorld,
-                  child: const Text("Send Text")),
-              ElevatedButton(
-                  onPressed: sendBinary,
-                  child: const Text("Send binary to peer")),
-            ],
+        appBar: AppBar(title: Text(emailSender),),
+        body: SafeArea(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                _renderState(),
+                const Text(
+                  'CHAT:',
+                ),
+                Expanded(child: ListView.builder(
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final isSender = messages[index].sender == email;
+                    final bg = isSender ? Colors.white : Colors.lightBlue.shade100;
+        
+                    return ListTile(
+                      title: Text(messages[index].message),
+                      subtitle: Text(messages[index].date),
+                      tileColor: bg,
+                    );
+                  })),
+                TextField(
+                  controller: _chatController,
+                  decoration: const InputDecoration(
+                    fillColor: Colors.white,
+                  ),
+                ),
+                ElevatedButton(
+                    onPressed: sendHelloWorld,
+                    child: const Text("Send Text")),
+                ElevatedButton(
+                    onPressed: sendBinary,
+                    child: const Text("Send binary to peer")),
+              ],
+            ),
           ),
         ));
     }
@@ -189,162 +224,3 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 }
-
-
-
-/* import 'dart:async';
-import 'dart:convert';
-
-import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:geproye/models/chat_user.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:http/http.dart' as http;
-
-final supabase = Supabase.instance.client;
-
-extension ShowSnackBar on BuildContext {
-  void showSnackBar({
-    required String message,
-    Color backgroundColor = Colors.white,
-  }) {
-    ScaffoldMessenger.of(this).showSnackBar(SnackBar(
-      content: Text(message),
-      backgroundColor: backgroundColor,
-    ));
-  }
-
-  void showErrorSnackBar({required String message}) {
-    showSnackBar(message: message, backgroundColor: Colors.red);
-  }
-}
-
-class ChatPage extends StatefulWidget {
-  const ChatPage({super.key});
-
-  @override
-  State<ChatPage> createState() => _ChatPageState();
-}
-
-class _ChatPageState extends State<ChatPage> {
-
-  String ip = "";
-
-  Future<List<ChatUser>> getChatUsers() async {
-    try {
-      final response = await http.get(Uri.parse('${dotenv.env['API_URL']}/discover'));
-      final body = json.decode(response.body);
-      final chatUsers = List<ChatUser>.from(body.map((pj) {
-        final user = ChatUser.fromJson(pj);
-        return user.ip != ip ? user : null;
-      }).where((user) => user != null).toList());
-      
-      return chatUsers;
-    } catch (e) {
-      print('error[chat]: ${e.toString()}');
-    }
-
-    return [];
-  }
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text('Ingreso')
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Center(
-            child: SizedBox(
-              width: 180.0,
-              child: Center(
-                child: Image.asset('assets/images/logo.png'),
-              ),
-            ),
-          ),
-          const SizedBox(height: 60,),
-          Text('Bienvenido!', style: GoogleFonts.robotoMono(fontWeight: FontWeight.bold, fontSize: 42),),
-          const SizedBox(height: 30,),
-          Expanded(
-            child: FutureBuilder<List<ChatUser>>(
-              future: getChatUsers(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.connectionState ==
-                    ConnectionState.done) {
-                  final data = snapshot.data;
-                  if (data != null) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8.0, horizontal: 20.0),
-                      child: Table(
-                        border: const TableBorder(
-                          horizontalInside: BorderSide(
-                              width: 1,
-                              color: Color.fromARGB(79, 33, 149, 243),
-                              style: BorderStyle.solid),
-                          verticalInside: BorderSide(
-                              width: 1,
-                              color: Color.fromARGB(79, 33, 149, 243),
-                              style: BorderStyle.solid)
-                          ),
-                        columnWidths: const {
-                          0: FractionColumnWidth(0.5),
-                          1: FractionColumnWidth(0.5),
-                        },
-                        defaultVerticalAlignment:
-                            TableCellVerticalAlignment.middle,
-                        children: <TableRow>[
-                          const TableRow(
-                            children: [
-                              Center(
-                                child: Text('Email', style: TextStyle(fontWeight: FontWeight.bold),),
-                              ),
-                              Center(
-                                child: Text('Ip', style: TextStyle(fontWeight: FontWeight.bold),),
-                              ),
-                            ],
-                          ),
-                          for (var it in data)
-                            TableRow(
-                              children: [
-                                Center(
-                                    child: Text(
-                                        it.email ?? 'Sin definir')),
-                                Center(
-                                    child: Text(
-                                        it.ip ?? 'Sin definir')),
-                              ],
-                            ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  return const Text("No found");
-                }
-
-                return const Text("Error");
-              }),
-          ),
-        ],
-      ),
-    );
-  }
-} */
