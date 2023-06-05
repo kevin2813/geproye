@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -91,7 +90,7 @@ class _AddIterationDialogState extends State<AddIterationDialog> {
                 onPressed: () async {
                   final f = DateFormat('yyyy-MM-dd');
                   try {
-                    var res = await http.post(Uri.parse('${dotenv.env['API_URL']}/project/${widget.projectId}/iteration'), body: <String, String>{
+                    var res = await http.post(Uri.parse('${const String.fromEnvironment('API_URL')}/project/${widget.projectId}/iteration'), body: <String, String>{
                       //'id': '${widget.lastId + 1}',
                       'fechaInicio': f.format(_dtFechaInicio??DateTime.now()).toString(),
                       'fechaTermino': f.format(_dtFechaTermino??DateTime.now()).toString(),

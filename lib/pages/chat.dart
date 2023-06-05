@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:peerdart/peerdart.dart';
 
@@ -32,7 +31,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final host = dotenv.env['PEER_HOST']!.replaceFirst('http://', '');
+  final host = const String.fromEnvironment('PEER_HOST')!.replaceFirst('http://', '');
   final path = '/peer';
   late Peer peer;
   final TextEditingController _controller = TextEditingController();

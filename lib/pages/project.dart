@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -22,7 +21,7 @@ class _ProjectPageState extends State<ProjectPage> {
 
   Future<List<Iteration>> getIterations() async {
     try {
-      final response = await http.get(Uri.parse('${dotenv.env['API_URL']}/project/${widget.project.id}/iteration'));
+      final response = await http.get(Uri.parse('${const String.fromEnvironment('API_URL')}/project/${widget.project.id}/iteration'));
       final body = json.decode(response.body);
       final iterations = List<Iteration>.from(body['data'].map((pj) {
         return Iteration.fromJson(pj);
@@ -182,7 +181,7 @@ class _ProjectPageState extends State<ProjectPage> {
                                               color: Colors.red,
                                               onPressed: () async {
                                                 try {
-                                                  final response = await http.delete(Uri.parse('${dotenv.env['API_URL']}/project/${widget.project.id}/iteration/${it.id}'));
+                                                  final response = await http.delete(Uri.parse('${const String.fromEnvironment('API_URL')}/project/${widget.project.id}/iteration/${it.id}'));
                                                   refresh();
                                                 } catch (e) {
                                                   print('error fetch: ${e.toString()}');

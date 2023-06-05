@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -128,7 +128,7 @@ class _EditProjectDialogState extends State<EditProjectDialog> {
                   }
                   final f = DateFormat('yyyy-MM-dd');
                   try {
-                    var res = await http.patch(Uri.parse('${dotenv.env['API_URL']}/project/${widget.project.id}'), body: <String, String>{
+                    var res = await http.patch(Uri.parse('${const String.fromEnvironment('API_URL')}/project/${widget.project.id}'), body: <String, String>{
                       'nombre': _tecNombre.text,
                       'fecha_inicio': f.format(_dtFechaInicio??DateTime.now()).toString(),
                       'fecha_termino': f.format(_dtFechaTermino??DateTime.now()).toString(),

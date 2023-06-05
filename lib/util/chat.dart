@@ -2,7 +2,7 @@
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:simple_peer/simple_peer.dart';
 
 final supabase = Supabase.instance.client;

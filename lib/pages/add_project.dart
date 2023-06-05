@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -99,7 +98,7 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
                   }
                   final f = DateFormat('yyyy-MM-dd');
                   try {
-                    var res = await http.post(Uri.parse('${dotenv.env['API_URL']}/project'), body: <String, String>{
+                    var res = await http.post(Uri.parse('${const String.fromEnvironment('API_URL')}/project'), body: <String, String>{
                       //'id': '${widget.lastId + 1}',
                       'nombre': _tecNombre.text,
                       'fechaInicio': f.format(_dtFechaInicio??DateTime.now()).toString(),

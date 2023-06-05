@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -53,7 +52,7 @@ class _AddMemberDialogState extends State<AddMemberDialog> {
               TextButton(
                 onPressed: () async {
                   try {
-                    var res = await http.post(Uri.parse('${dotenv.env['API_URL']}/project/${widget.projectId}/member'), body: <String, String>{
+                    var res = await http.post(Uri.parse('${const String.fromEnvironment('API_URL')}/project/${widget.projectId}/member'), body: <String, String>{
                       //'id': '${widget.lastId + 1}',
                       'nombre': _tecNombre.text,
                       'cargo': _tecCargo.text,
