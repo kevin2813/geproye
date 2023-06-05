@@ -103,7 +103,7 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
                       'nombre': _tecNombre.text,
                       'fechaInicio': f.format(_dtFechaInicio??DateTime.now()).toString(),
                       'fechaTermino': f.format(_dtFechaTermino??DateTime.now()).toString(),
-                      'estado': '',
+                      'estado': 'Creado',
                     });
                     
                     if(context.mounted) Navigator.pop(context);

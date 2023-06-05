@@ -31,7 +31,7 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final host = const String.fromEnvironment('PEER_HOST')!.replaceFirst('http://', '');
+  final host = const String.fromEnvironment('PEER_HOST')!.replaceFirst('https://', '');
   final path = '/peer';
   late Peer peer;
   final TextEditingController _controller = TextEditingController();
