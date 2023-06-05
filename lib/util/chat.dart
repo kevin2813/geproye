@@ -14,7 +14,7 @@ class Chat
   late IO.Socket socket;
   late Peer peer;
   void init() async {
-    socket = IO.io(const String.fromEnvironment('SERVER_URL']);
+    socket = IO.io(dotenv.env['SERVER_URL']);
     email = supabase.auth.currentUser!.email ?? '';
     final resIp = await http.get(Uri.parse('https://api.ipify.org'));
     ip = resIp.body;

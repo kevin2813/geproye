@@ -65,7 +65,7 @@ class _EditRequirementDialogState extends State<EditRequirementDialog> {
               TextButton(
                 onPressed: () async {
                   try {
-                    var res = await http.patch(Uri.parse('${const String.fromEnvironment('API_URL')}/project/${widget.projectId}/requirement/${widget.requirement.id}'), body: <String, String>{
+                    var res = await http.patch(Uri.parse('${dotenv.env['API_URL']}/project/${widget.projectId}/requirement/${widget.requirement.id}'), body: <String, String>{
                       'tipo': _tecTipo.text,
                       'descripcion': _tecDescripcion.text,
                     });

@@ -99,7 +99,7 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
                   }
                   final f = DateFormat('yyyy-MM-dd');
                   try {
-                    var res = await http.post(Uri.parse('${const String.fromEnvironment('API_URL')}/project'), body: <String, String>{
+                    var res = await http.post(Uri.parse('${dotenv.env['API_URL']}/project'), body: <String, String>{
                       //'id': '${widget.lastId + 1}',
                       'nombre': _tecNombre.text,
                       'fechaInicio': f.format(_dtFechaInicio??DateTime.now()).toString(),

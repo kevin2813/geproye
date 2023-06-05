@@ -22,7 +22,7 @@ class _MembersPageState extends State<MembersPage> {
 
   Future<List<Member>> getRequirements() async {
     try {
-      final response = await http.get(Uri.parse('${const String.fromEnvironment('API_URL')}/project/${widget.project.id}/member'));
+      final response = await http.get(Uri.parse('${dotenv.env['API_URL']}/project/${widget.project.id}/member'));
       final body = json.decode(response.body);
       final members = List<Member>.from(body['data'].map((pj) {
         return Member.fromJson(pj);
@@ -93,7 +93,7 @@ class _MembersPageState extends State<MembersPage> {
                                   color: Colors.red,
                                   onPressed: () async {
                                     try {
-                                      final response = await http.delete(Uri.parse('${const String.fromEnvironment('API_URL')}/project/${widget.project.id}/member/${data[index].id}'));
+                                      final response = await http.delete(Uri.parse('${dotenv.env['API_URL']}/project/${widget.project.id}/member/${data[index].id}'));
                                       refresh();
                                     } catch (e) {
                                       print('error fetch: ${e.toString()}');

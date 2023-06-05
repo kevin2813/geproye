@@ -64,7 +64,7 @@ class _EditMemberDialogState extends State<EditMemberDialog> {
               TextButton(
                 onPressed: () async {
                   try {
-                    var res = await http.patch(Uri.parse('${const String.fromEnvironment('API_URL')}/project/${widget.projectId}/member/${widget.member.id}'), body: <String, String>{
+                    var res = await http.patch(Uri.parse('${dotenv.env['API_URL']}/project/${widget.projectId}/member/${widget.member.id}'), body: <String, String>{
                       'nombre': _tecNombre.text,
                       'cargo': _tecCargo.text,
                     });
