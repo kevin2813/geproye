@@ -52,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
         _passwordController.clear();
       }
     } on AuthException catch (error) {
-      context.showErrorSnackBar(message: error.message);
+      context.showErrorSnackBar(message: 'AUTH_ERROR: ${error.message}');
     } catch (error) {
       context.showErrorSnackBar(message: 'Unexpected error occurred');
     }
