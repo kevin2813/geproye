@@ -91,7 +91,7 @@ class _AddIterationDialogState extends State<AddIterationDialog> {
                 onPressed: () async {
                   final f = DateFormat('yyyy-MM-dd');
                   try {
-                    var res = await http.post(Uri.parse('${dotenv.env['API_URL']}/project/${widget.projectId}/iteration'), body: <String, String>{
+                    var res = await http.post(Uri.parse('${const String.fromEnvironment('API_URL')}/project/${widget.projectId}/iteration'), body: <String, String>{
                       //'id': '${widget.lastId + 1}',
                       'fechaInicio': f.format(_dtFechaInicio??DateTime.now()).toString(),
                       'fechaTermino': f.format(_dtFechaTermino??DateTime.now()).toString(),

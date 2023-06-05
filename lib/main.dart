@@ -8,11 +8,9 @@ import 'package:geproye/util/sb.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  await dotenv.load();
-  
   await Supabase.initialize(
-    url: dotenv.env['SUPABASE_API_URL']!,
-    anonKey: dotenv.env['SUPABASE_API_KEY']!,
+    url: const String.fromEnvironment('SUPABASE_API_URL'),
+    anonKey: const String.fromEnvironment('SUPABASE_API_KEY'),
   );
 
   //Chat.init();

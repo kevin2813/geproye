@@ -21,7 +21,7 @@ class _HomeState extends State<HomePage> {
   Future<List<Project>> getProjects() async {
     try {
       final response =
-          await http.get(Uri.parse('${dotenv.env['API_URL']}/project'));
+          await http.get(Uri.parse('${const String.fromEnvironment('API_URL')}/project'));
       final body = json.decode(response.body);
       final projects = List<Project>.from(body['data'].map((pj) {
         return Project.fromJson(pj);
@@ -128,7 +128,7 @@ class _HomeState extends State<HomePage> {
                                   onPressed: () async {
                                     try {
                                       final response = await http.delete(Uri.parse(
-                                          '${dotenv.env['API_URL']}/project/${data[index].id}'));
+                                          '${const String.fromEnvironment('API_URL')}/project/${data[index].id}'));
                                       refresh();
                                     } catch (e) {
                                       print('error fetch: ${e.toString()}');

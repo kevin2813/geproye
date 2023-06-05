@@ -22,7 +22,7 @@ class _RequirementsPageState extends State<RequirementsPage> {
 
   Future<List<Requirement>> getRequirements() async {
     try {
-      final response = await http.get(Uri.parse('${dotenv.env['API_URL']}/project/${widget.project.id}/requirement'));
+      final response = await http.get(Uri.parse('${const String.fromEnvironment('API_URL')}/project/${widget.project.id}/requirement'));
       final body = json.decode(response.body);
       final requirements = List<Requirement>.from(body['data'].map((pj) {
         return Requirement.fromJson(pj);
@@ -93,7 +93,7 @@ class _RequirementsPageState extends State<RequirementsPage> {
                                   color: Colors.red,
                                   onPressed: () async {
                                     try {
-                                      final response = await http.delete(Uri.parse('${dotenv.env['API_URL']}/project/${widget.project.id}/requirement/${data[index].id}'));
+                                      final response = await http.delete(Uri.parse('${const String.fromEnvironment('API_URL')}/project/${widget.project.id}/requirement/${data[index].id}'));
                                       refresh();
                                     } catch (e) {
                                       print('error fetch: ${e.toString()}');

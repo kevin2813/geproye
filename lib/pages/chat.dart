@@ -32,9 +32,9 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  final host = dotenv.env['PEER_HOST']!.replaceFirst('http://', '');
-  final port = int.parse(dotenv.env['PEER_PORT']!);
-  final path = dotenv.env['PEER_PATH'];
+  final host = const String.fromEnvironment('PEER_HOST').replaceFirst('http://', '');
+  final port = int.parse(const String.fromEnvironment('PEER_PORT'));
+  final path = const String.fromEnvironment('PEER_PATH');
   late Peer peer;
   final TextEditingController _controller = TextEditingController();
   final TextEditingController _chatController = TextEditingController();

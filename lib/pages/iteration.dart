@@ -23,7 +23,7 @@ class _ActivityPageState extends State<ActivityPage> {
 
   Future<List<Iteration>> getIterations() async {
     try {
-      final response = await http.get(Uri.parse('${dotenv.env['API_URL']}/v1/project'));
+      final response = await http.get(Uri.parse('${const String.fromEnvironment('API_URL')}/v1/project'));
       final body = json.decode(response.body);
       final projects = List<Iteration>.from(body['data'].map((pj) {
         return Iteration.fromJson(pj);
