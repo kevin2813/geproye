@@ -55,7 +55,7 @@ class _ChatPageState extends State<ChatPage> {
   void initState() {
     super.initState();
 
-    peer = Peer(options: PeerOptions(host: host, port: port, path: path, debug: LogLevel.Errors, secure: false));
+    peer = Peer(options: PeerOptions(host: host, path: path, debug: LogLevel.Errors, secure: false));
     //peer = Peer(options: PeerOptions(host: 'geproyepeer.azurewebsites.net', path: '/peer', debug: LogLevel.All));
 
     peer.on("open").listen((id) {
