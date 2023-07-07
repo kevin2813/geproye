@@ -43,6 +43,7 @@ class _ChatPageState extends State<ChatPage> {
 
    @override
   void dispose() {
+    peer.close();
     peer.dispose();
     _controller.dispose();
     _chatController.dispose();
@@ -56,7 +57,7 @@ class _ChatPageState extends State<ChatPage> {
     peer = Peer(options: PeerOptions(host: host, path: path, debug: LogLevel.Errors, secure: true));
     //peer = Peer(options: PeerOptions(host: 'geproyepeer.azurewebsites.net', path: '/peer', debug: LogLevel.All));
 
-    peer.on("open").listen((id) {
+    /* peer.on("open").listen((id) {
       print('data open1');
       setState(() {
         peerId = peer.id;
@@ -90,7 +91,7 @@ class _ChatPageState extends State<ChatPage> {
         connected = true;
       });
       
-    });
+    }); */
   }
 
   void connect() {
@@ -100,10 +101,11 @@ class _ChatPageState extends State<ChatPage> {
     conn.on("open").listen((event) {
       print('data open2');
       setState(() {
+        peerId = peer.id;
         connected = true;
       });
 
-      connection.on("close").listen((event) {
+      conn.on("close").listen((event) {
         print('data close2');
         setState(() {
           connected = false;
@@ -156,12 +158,6 @@ class _ChatPageState extends State<ChatPage> {
                 controller: _controller,
               ),
               ElevatedButton(onPressed: connect, child: const Text("connect")),
-              ElevatedButton(
-                  onPressed: sendHelloWorld,
-                  child: const Text("Send Hello World to peer")),
-              ElevatedButton(
-                  onPressed: sendBinary,
-                  child: const Text("Send binary to peer")),
             ],
           ),
         ));
