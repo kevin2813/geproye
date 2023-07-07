@@ -63,7 +63,7 @@ class _ChatPageState extends State<ChatPage> {
         peerId = peer.id;
       });
     });
-    /*
+
     peer.on<DataConnection>("connection").listen((event) {
       conn = event;
 
@@ -91,7 +91,7 @@ class _ChatPageState extends State<ChatPage> {
         connected = true;
       });
       
-    }); */
+    });
   }
 
   void connect() {
@@ -101,11 +101,10 @@ class _ChatPageState extends State<ChatPage> {
     conn.on("open").listen((event) {
       print('data open2');
       setState(() {
-        peerId = peer.id;
         connected = true;
       });
 
-      conn.on("close").listen((event) {
+      connection.on("close").listen((event) {
         print('data close2');
         setState(() {
           connected = false;
