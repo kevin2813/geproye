@@ -57,13 +57,13 @@ class _ChatPageState extends State<ChatPage> {
     peer = Peer(options: PeerOptions(host: host, path: path, debug: LogLevel.Errors, secure: true));
     //peer = Peer(options: PeerOptions(host: 'geproyepeer.azurewebsites.net', path: '/peer', debug: LogLevel.All));
 
-    /* peer.on("open").listen((id) {
+    peer.on("open").listen((id) {
       print('data open1');
       setState(() {
         peerId = peer.id;
       });
     });
-
+    /*
     peer.on<DataConnection>("connection").listen((event) {
       conn = event;
 
